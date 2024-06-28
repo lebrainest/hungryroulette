@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hungry Roulette: Spin, Eat, Repeat!</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            background-color: #f8f8ff;
+            color: #333;
+            padding: 50px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 20px;
+            background-color: #ff6347;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #e5533d;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .restaurant {
+            margin: 10px 0;
+        }
+        select {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hungry Roulette: Spin, Eat, Repeat!</h1>
+    <div>
+        <select id="countrySelect" onchange="updateProvinces()">
+            <option value="">Select Country</option>
+            <option value="Canada">Canada</option>
+            <option value="USA">USA</option>
+        </select>
+        <select id="provinceSelect" onchange="updateCities()">
+            <option value="">Select Province/State</option>
+        </select>
+        <select id="citySelect">
+            <option value="">Select City</option>
+        </select>
+    </div>
+    <button onclick="suggestMeal()">Spin the Wheel</button>
+    <div class="results" id="mealResult"></div>
+    <div class="results" id="restaurantResults"></div>
+
+    <script>
+        const locationData = {
+            Canada: {
+                Ontario: ["Toronto", "Ottawa", "Hamilton"],
+                Quebec: ["Montreal", "Quebec City", "Laval"]
+            },
+            USA: {
+                California: ["Los Angeles", "San Francisco", "San Diego"],
+                New York: ["New York City", "Buffalo", "Rochester"]
+            }
+        };
+
+        function updateProvinces() {
+            const countrySelect = document.getElementById('countrySelect');
+            const provinceSelect = document.getElementById('provinceSelect');
+            const citySelect = document.getElementById('citySelect');
+            const selectedCountry = countrySelect.value;
+
+            provinceSelect.innerHTML = '<option value="">Select Province/State</option>';
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            if (selectedCountry) {
+                const provinces = Object.keys(locationData[selectedCountry]);
+                provinces.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province;
+                    option.innerText = province;
+                    provinceSelect.appendChild(option);
+                });
+            }
+        }
+
+        function updateCities() {
+            const countrySelect = document.getElementById('countrySelect');
+            const provinceSelect = document.getElementById('provinceSelect');
+            const citySelect = document.getElementById('citySelect');
+            const selectedCountry = countrySelect.value;
+            const selectedProvince = provinceSelect.value;
+
+            citySelect.innerHTML = '<option value="">Select City</option>';
+
+            if (selectedCountry && selectedProvince) {
+                const cities = locationData[selectedCountry][selectedProvince];
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.innerText = city;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        function suggestMeal() {
+            const meals = {
+                breakfast: ["Pancakes", "Omelette", "Smoothie", "Cereal", "Yogurt"],
+                lunch: ["Sandwich", "Salad", "Burger", "Sushi", "Pizza"],
+                dinner: ["Pasta", "Steak", "Tacos", "Soup", "Curry"]
+            };
+
+            const restaurants = {
+                Toronto: {
+                    breakfast: ["Joe's Diner", "Sunshine Cafe", "Morning Glory"],
+                    lunch: ["Healthy Bites", "Quick Eats", "Lunch Box"],
+                    dinner: ["Gourmet Grill", "Evening Delight", "Dinner Dash"]
+                },
+                "New York City": {
+                    breakfast: ["Early Bird Eatery", "Breakfast Nook", "Morning Brew"],
+                    lunch: ["Midday Munch", "Noon Delight", "Quick Lunch"],
+                    dinner: ["Night Feast", "Dine Fine", "Dinner Dash"]
+                },
+                // Add more cities and their respective restaurants here
+            };
+
+            const now = new Date();
+            const hour = now.getHours();
+            let mealType;
+
+            if (hour < 12) {
+                mealType = 'breakfast';
+            } else if (hour < 17) {
+                mealType = 'lunch';
+            } else {
+                mealType = 'dinner';
+            }
+
+            const selectedCity = document.getElementById('citySelect').value;
+
+            if (selectedCity && restaurants[selectedCity]) {
+                const meal = meals[mealType][Math.floor(Math.random() * meals[mealType].length)];
+                const restaurant = restaurants[selectedCity][mealType][Math.floor(Math.random() * restaurants[selectedCity][mealType].length)];
+
+                document.getElementById('mealResult').innerText = `Suggested ${mealType}: ${meal}`;
+                document.getElementById('restaurantResults').innerHTML = `<h2>Suggested Restaurant:</h2><div class="restaurant">${restaurant}</div>`;
+            } else {
+                document.getElementById('mealResult').innerText = 'Please select a valid city.';
+                document.getElementById('restaurantResults').innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
